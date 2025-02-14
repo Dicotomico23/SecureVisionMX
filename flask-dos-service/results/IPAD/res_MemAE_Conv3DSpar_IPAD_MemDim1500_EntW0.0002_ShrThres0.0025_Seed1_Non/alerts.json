@@ -1,0 +1,9 @@
+[
+    {
+        "message": "Anomalia detectada: el producto est\u00e1 en posici\u00f3n incorrecta (frame 1 a 10)",
+        "first_frame": 1,
+        "last_frame": 10,
+        "timestamp": "2025-02-13 14:12:47",
+        "alert_sent": false
+    }
+]

@@ -3,3 +3,10 @@ flask-dos-service/static/videos/
 *.mp4
 *.dylib
 *.so
+.DS_Store
+*.pages
+anomaly_report.pdf
+datos_red.json
+memae_env/
+__pycache__/
+*.ipynb_checkpoints
