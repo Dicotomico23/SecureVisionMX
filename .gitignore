@@ -1,0 +1,5 @@
+memae_env/
+flask-dos-service/static/videos/
+*.mp4
+*.dylib
+*.so
