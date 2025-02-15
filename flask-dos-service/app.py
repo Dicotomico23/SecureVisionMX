@@ -9,18 +9,17 @@ from PIL import Image
 import utils
 import torch
 from torchvision import transforms
-import numpy as np
 import time
 import json
 from models import AutoEncoderCov3D, AutoEncoderCov3DMem
 from options.testing_options import TestOptions
 from script_testing import AnomalyDetector  
 from flask_socketio import SocketIO
+from AI_Agent import agent_executor, generate_pdf_report  # 🔹 Importar el agente y la función de reportes
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
-socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5500")
-
+CORS(app, resources={r"/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # ===============================
 # CARGA DE CONFIGURACIÓN Y MODELO
@@ -45,10 +44,7 @@ model_setting = utils.get_model_setting(opt)
 
 # Model path
 model_root = opt.ModelRoot
-if opt.ModelFilePath:
-    model_path = opt.ModelFilePath
-else:
-    model_path = os.path.join(model_root, model_setting + '.pt')
+model_path = opt.ModelFilePath if opt.ModelFilePath else os.path.join(model_root, model_setting + '.pt')
 
 # Test result path
 te_res_root = opt.OutRoot
@@ -68,18 +64,11 @@ model.load_state_dict(model_para)
 model.to(device)
 model.eval()
 
-if chnum_in_ == 1:
-    norm_mean = [0.5]
-    norm_std = [0.5]
-elif chnum_in_ == 3:
-    norm_mean = (0.5, 0.5, 0.5)
-    norm_std = (0.5, 0.5, 0.5)
-
 frame_trans = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize(norm_mean, norm_std)
+    transforms.Normalize([0.5] * chnum_in_, [0.5] * chnum_in_)
 ])
-unorm_trans = utils.UnNormalize(mean=norm_mean, std=norm_std)
+unorm_trans = utils.UnNormalize(mean=[0.5] * chnum_in_, std=[0.5] * chnum_in_)
 
 # Crear instancia del detector de anomalías
 detector = AnomalyDetector(model, device, frame_trans, img_crop_size, threshold=0.01)
@@ -87,30 +76,28 @@ detector = AnomalyDetector(model, device, frame_trans, img_crop_size, threshold=
 # ===============================
 # DEFINICIÓN DE ENDPOINTS DE LA API
 # ===============================
+
 @app.route('/api/infer', methods=['GET'])
 def infer():
-    """
-    Ejecuta el detector sobre las primeras 100 imágenes (simulando video en vivo),
-    guarda alertas en un archivo JSON y retorna los resultados.
-    """
+    """ Ejecuta el detector sobre imágenes y devuelve los resultados. """
     image_list = sorted(glob.glob(os.path.join(frames_dir, '*.jpg')))[:10]
     start_time = time.time()
     errors = detector.run_live_inference(image_list, sleep_time=0)
     end_time = time.time()
-    inference_time = end_time - start_time
-    alerts_json_path = os.path.join(te_res_path, "alerts.json")
-    detector.save_alerts(alerts_json_path)
+    
+    detector.save_alerts(os.path.join(te_res_path, "alerts.json"))
+    
     return jsonify({
-        'inference_time': inference_time,
+        'inference_time': end_time - start_time,
         'errors': errors,
         'alerts': detector.alerts
     })
 
-# Initialize the model
+# Inicializar el modelo de detección de anomalías en la red
 hif = HybridIsolationForest(t=10, psi=64)
 
-# Train with synthetic data
 def train_with_synthetic_data(hif_model, n_samples=300):
+    """ Entrena el modelo HIF con datos sintéticos. """
     X_train = np.random.rand(n_samples, 78) * 0.5
     y_train = np.zeros(n_samples)
     hif_model.fit(X_train, y_train)
@@ -123,30 +110,85 @@ def index():
 
 @app.route('/simulate_dos_attacks', methods=['POST'])
 def simulate_dos_attacks():
+    """ Simula ataques DoS y retorna alertas si se detectan. """
     X_dos = np.random.rand(10, 78) * 0.8 + 0.2
     for row in X_dos:
-        idxs = np.random.choice(X_dos.shape[1], size=10, replace=False)
-        row[idxs] *= 1.2
+        row[np.random.choice(X_dos.shape[1], size=10, replace=False)] *= 1.2
 
     dos_scores = hif.predict(X_dos)
     threshold = 0.2335994392273122
-    y_pred = dos_scores > threshold
-
-    alerts = []
-    for i, score in enumerate(dos_scores):
-        if y_pred[i]:
-            alerts.append(f"[DOS] Instancia {i+1}: score={score:.4f} -> ATAQUE DETECTADO")
+    alerts = [f"[DOS] Instancia {i+1}: score={score:.4f} -> ATAQUE DETECTADO"
+              for i, score in enumerate(dos_scores) if score > threshold]
 
     return jsonify(alerts)
 
 @app.route('/api/door-control', methods=['POST'])
 def toggle_door():
-    # Ejemplo de endpoint para el control de la puerta
+    """ Control de puertas (ejemplo de automatización). """
     return jsonify({'door_state': 'Abierto'})
+
+# ===============================
+# INTEGRACIÓN DEL AGENTE INTELIGENTE
+# ===============================
+
+@app.route('/api/ai-agent', methods=['POST'])
+def ai_agent():
+    """
+    Endpoint para interactuar con el agente inteligente.
+    Recibe una consulta y devuelve la respuesta generada.
+    """
+    data = request.get_json()
+    user_input = data.get("query", "Consulta de prueba")
+
+    # Ejecutar el agente
+    results = agent_executor.run(user_input)
+
+    # Generar reporte si es necesario
+    if "reporte" in user_input.lower():
+        report_path = generate_pdf_report(results)
+        return jsonify({'response': "Reporte generado con éxito.", 'report_path': report_path})
+
+    return jsonify({'response': results})
+
+@app.route('/api/agent-query', methods=['POST'])
+def agent_query():
+    """
+    Endpoint para interactuar con el agente inteligente.
+    Recibe una consulta y devuelve la respuesta generada.
+    """
+    data = request.get_json()
+    user_input = data.get("query", "Consulta de prueba")
+
+    # Ejecutar el agente
+    results = agent_executor.invoke(user_input)
+
+    # Extraer la respuesta; revisar por 'response' o 'output'
+    output = None
+    if isinstance(results, dict):
+        output = results.get("response") or results.get("output")
+    else:
+        output = results
+
+    if not output:
+        output = "ChatOllama no conectado"
+
+    print("Consulta:", user_input)
+    print("Respuesta:", output)
+
+    return jsonify({'response': output})
+
+# ===============================
+# MANEJO DE SOCKETIO PARA CHAT EN TIEMPO REAL
+# ===============================
+@socketio.on('user_message')
+def handle_user_message(data):
+    user_input = data['message']
+    response = agent_executor.run(user_input)
+    socketio.emit('bot_response', {'message': response})
 
 # ===============================
 # EJECUCIÓN DEL SERVIDOR
 # ===============================
 if __name__ == '__main__':
-    print("Sesión iniciada: el servidor está listo para realizar inferencias con los modelos almacenados.")
+    print("Sesión iniciada: el servidor está listo para realizar inferencias con los modelos almacenados y el agente inteligente.")
     socketio.run(app, host='0.0.0.0', port=8000, debug=True)

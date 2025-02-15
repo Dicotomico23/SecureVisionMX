@@ -1,113 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Seguridad Inteligente</title>
-  <style>
-      :root {
-          --primary-color: #2c3e50;
-          --secondary-color: #3498db;
-          --danger-color: #e74c3c;
-          --success-color: #2ecc71;
-      }
-      body {
-          font-family: 'Segoe UI', system-ui, sans-serif;
-          margin: 0;
-          padding: 0;
-          background-color: #ecf0f1;
-      }
-      header {
-          background-color: var(--primary-color);
-          color: white;
-          padding: 1rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-      }
-      .dashboard {
-          display: grid;
-          grid-template-columns: 2fr 1fr;
-          gap: 1.5rem;
-          padding: 1.5rem;
-      }
-      .camera-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-      }
-      .camera-feed {
-          background: #fff;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          text-align: center;
-      }
-      .camera-feed video,
-      .camera-feed img {
-          width: 256px;
-          height: 256px;
-          object-fit: cover;
-      }
-      .alert-panel {
-          background: #fff;
-          padding: 1rem;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-      .alert {
-          padding: 0.8rem;
-          margin: 0.5rem 0;
-          border-radius: 4px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-      }
-      .alert-info {
-          background-color: #d1ecf1;
-          border: 1px solid #bee5eb;
-      }
-      .alert-critical {
-          background-color: #f8d7da;
-          border: 1px solid #f5c6cb;
-      }
-      .network-status {
-          background: #fff;
-          padding: 1rem;
-          border-radius: 8px;
-          margin-bottom: 1.5rem;
-      }
-      .actuators-panel {
-          background: #fff;
-          padding: 1rem;
-          border-radius: 8px;
-      }
-      .llm-report {
-          background: #fff;
-          padding: 1rem;
-          border-radius: 8px;
-          margin-top: 1.5rem;
-      }
-      button {
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: opacity 0.2s;
-      }
-      button:hover {
-          opacity: 0.8;
-      }
-      .btn-primary {
-          background-color: var(--secondary-color);
-          color: white;
-      }
-      .btn-danger {
-          background-color: var(--danger-color);
-          color: white;
-      }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Seguridad Inteligente</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ecf0f1;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+        .camera-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .camera-feed {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .camera-feed video,
+        .camera-feed img {
+            width: 256px;
+            height: 256px;
+            object-fit: cover;
+        }
+        .alert-panel, .llm-report {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .alert {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+        }
+        .alert-critical {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .network-status {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .actuators-panel {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -132,14 +133,16 @@
             </section>
             <section class="alert-panel">
                 <h2>Alertas Activas</h2>
-                <!-- Botón para iniciar la inspección -->
                 <button id="start-inspection" class="btn-primary">Iniciar Inspección</button>
                 <div id="alert-list"></div>
             </section>
             <section class="llm-report">
                 <h2>Generador de Reportes Automáticos</h2>
                 <textarea id="report-prompt" placeholder="Ingrese su consulta..."></textarea>
-                <button onclick="generateReport()" class="btn-primary">Generar Reporte</button>
+                <div style="margin-bottom: 0.5rem;">
+                    <button id="consultar" class="btn-primary">Consultar</button>
+                    <button id="generar-pdf" class="btn-primary">Generar PDF</button>
+                </div>
                 <div id="report-output"></div>
             </section>
         </main>
@@ -147,9 +150,7 @@
             <section class="network-status">
                 <h2>Estado de la Red</h2>
                 <div id="network-metrics"></div>
-                <!-- Contenedor para alertas de ataques de red -->
                 <div id="network-alerts"></div>
-                <!-- Botón para simular un ataque de red -->
                 <button id="simulate-network-attack" class="btn-danger">Simular Ataque de Red</button>
             </section>
             <section class="actuators-panel">
@@ -164,17 +165,10 @@
     <!-- Cargar Socket.IO -->
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script>
-        // Transmisión en vivo para Cámara 1 usando archivo de video .mp4
+        // Cámara 1: transmisión en vivo usando archivo de video .mp4
         document.getElementById('camera1').src = "http://127.0.0.1:8000/static/videos/video1.mp4";
 
-        // Conexión WebSocket para alertas en tiempo real (placeholder)
-        const ws = new WebSocket('wss://tuservidor.com/ws-alerts');
-        ws.onmessage = (event) => {
-            const alertData = JSON.parse(event.data);
-            addAlert(alertData.message, alertData.level);
-        };
-
-        // Conexión a Socket.IO (asumiendo que se sirve desde http://127.0.0.1:8000)
+        // Conexión a Socket.IO
         const socket = io('http://127.0.0.1:8000');
         socket.on('alert', (data) => {
             addAlert(data.message, data.level);
@@ -188,7 +182,6 @@
 
         function addAlert(message, level = 'info') {
             const alertDiv = document.createElement('div');
-            // Si es alerta crítica, se utiliza la clase alert-critical
             alertDiv.className = level === 'critical' ? 'alert alert-critical' : 'alert alert-info';
             alertDiv.innerHTML = `
                 ${message}
@@ -198,7 +191,6 @@
         }
 
         function startInspection() {
-            // Limpiar la lista de alertas y mostrar mensaje de inspección
             const alertContainer = document.getElementById("alert-list");
             alertContainer.innerHTML = "";
             const inspectionMsg = document.createElement("div");
@@ -207,7 +199,6 @@
             inspectionMsg.textContent = "Inspeccionando camara 1, buscando anomalias ...";
             alertContainer.appendChild(inspectionMsg);
 
-            // Llamada a la API de inferencia
             fetch('http://127.0.0.1:8000/api/infer')
                 .then(response => {
                     if (!response.ok) {
@@ -216,22 +207,17 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Inference completed:', data);
-                    // Eliminar mensaje de inspección
                     const msg = document.getElementById("inspection-msg");
                     if (msg) { msg.remove(); }
                     data.alerts.forEach(alert => {
-                        // Alertas de anomalía resaltadas como críticas
                         addAlert(alert.message, "critical");
                     });
                 })
                 .catch(error => console.error('Error en inferencia:', error));
         }
 
-        // Asignar evento al botón de inspección
         document.getElementById("start-inspection").addEventListener("click", startInspection);
 
-        // Simulación de datos de red
         setInterval(() => {
             document.getElementById('network-metrics').innerHTML = `
                 <p>Latencia: ${Math.floor(Math.random() * 50)}ms</p>
@@ -240,11 +226,9 @@
             `;
         }, 3000);
 
-        // Función para simular alertas de ataques de red y mostrarlas debajo de los datos de red
         function simulateNetworkAttack() {
             const message = "¡Alerta! Se ha detectado un ataque en la red";
             const networkAlerts = document.getElementById("network-alerts");
-            // Limpiar alertas previas en el contenedor
             networkAlerts.innerHTML = "";
             const alertDiv = document.createElement("div");
             alertDiv.className = "alert alert-critical";
@@ -255,23 +239,42 @@
             networkAlerts.appendChild(alertDiv);
         }
 
-        // Asignar evento al botón de simular ataque de red
         document.getElementById("simulate-network-attack").addEventListener("click", simulateNetworkAttack);
 
-        // Función para generar reportes automáticos (ejemplo)
-        async function generateReport() {
+        async function consultar() {
             const prompt = document.getElementById('report-prompt').value;
-            const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-xxl', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer TU_API_KEY',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ inputs: prompt })
+            const response = await fetch("http://127.0.0.1:8000/api/agent-query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: prompt })
             });
             const result = await response.json();
-            document.getElementById('report-output').textContent = result[0]?.generated_text || 'No se generó un reporte.';
+            let output;
+            if (typeof result.output === "object") {
+                output = result.output.answer || JSON.stringify(result.output, null, 2);
+            } else {
+                output = result.response;
+            }
+            document.getElementById("report-output").innerHTML = `<p>${output}</p>`;
         }
+
+        async function generarPdf() {
+            const prompt = document.getElementById('report-prompt').value + " reporte";
+            const response = await fetch("http://127.0.0.1:8000/api/agent-query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: prompt })
+            });
+            const result = await response.json();
+            if(result.report_path) {
+                window.open("http://127.0.0.1:8000/static/" + result.report_path, "_blank");
+            } else {
+                document.getElementById("report-output").innerHTML = `<p>${result.output}</p>`;
+            }
+        }
+
+        document.getElementById("consultar").addEventListener("click", consultar);
+        document.getElementById("generar-pdf").addEventListener("click", generarPdf);
     </script>
 </body>
 </html>
